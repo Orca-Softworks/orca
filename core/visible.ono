@@ -1,0 +1,11 @@
+[ # Visible is if  ]
+[ union
+    [ Visible
+        [ public ]
+        [ private ]
+
+        [ usable build ]
+        [ visibility public ]
+    ]
+
+]

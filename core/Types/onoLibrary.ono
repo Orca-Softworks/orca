@@ -1,0 +1,190 @@
+[ contract Ono-Library
+    [ # This contract is one of the core pieces of the Ono code model. ]
+
+    [ part links [ Vector Ono-Statements ] default-[] ]
+    [ part build [ Vector Ono-Statements ] default-[] ]
+
+    [ part load [ Vector Ono-Statements ] default-[] ]
+    [ part contracts [ Vector Ono-Contract ] default-[] ]
+    [ part functions [ Vector Ono-Function ] default-[] ]
+
+    [ part post-process [ Vector Ono-Statement ] default-[] ]
+
+    [ part tests Vector[Ono-Function] default-[] ]
+
+
+    [ data pin-data-in-load Boolean default-[ true ] ]
+
+    [ data allow-lossy-conversion Boolean
+        #-[ Lossy Conversions
+        You can enable this in order to allow casting from
+        a larger size data to a smaller size data. This would allow
+        casts from f64 -> f32, which could result in loss of precision. ]
+
+        [ default false ]
+    ]
+    [ data aliases [ Option [ Map String String ] ]
+        [ default none ]
+    ]
+    [ data runtime-mode Runtime-Mode
+       [ default strict ]
+    ]
+    [ data recursion-allowed Boolean
+        default false ]
+    ]
+    [ data float-inference [ Option [ oneof Floating-Point-64 Floating-Point-32 ] ]
+        [ default none ]
+    ]
+    [ data signed-integer-inference [ Option [ oneof Signed-Integer-8 Signed-Integer-16 Signed-Integer-32 Signed-Integer-64 ] ]
+        [ default none ]
+    ]
+    [ data unsigned-integer-inference [ Option [ oneof Unsigned-Integer-64 Unsigned-Integer-64 Unsigned-Integer-64 Unsigned-Integer-64 ] ]
+        [ default none ]
+    ]
+    [ data garbage-collect-rate [ Option Unsigned-Integer-64 ]
+        [ default none ]
+        [ can-be-set-if [ not [ equals runtime-mode relaxed ] ] ]
+    ]
+    [ data allow-allocation Boolean
+        [ default true ]
+    ]
+    [ data allocation-batching-cycle [ Option Duration ]
+       [ default none ]
+        [ #
+            If you want to batch allocations together.
+            TODO: is this viable?
+        ]
+    ]
+    [ data max-function-call-depth [ Option Unsigned-Integer-64 ]
+        [ #
+            If you will only allow a certain amount of nesting. Compiler
+            yells at you if you go over this.
+        ]
+        [ default none ]
+    ]
+
+    [ data functions [ Vector Ono-Function ]
+        [ # The different contracts defined in this library. ]
+    ]
+
+    [ data contracts [ Vector Ono-Contract ]
+        [ # The different contracts defined in this library. ]
+    ]
+
+    [ compose Ono-Common-datas ]
+]
+
+[ # Example
+[ library Example-Library
+    [ build [
+        [ # Build Time Data
+            Create build data accessible by dependent libraries and this library.
+            This data can also be used for macro/template expansion in source code.
+
+            Only functions marked with [ deterministic true ] will be able
+            to be used here. Functions with outputs where [ deterministic false ]
+            are not allowed. Functions are by default marked false.
+
+            Any macros in here will be fully expanded before moving onto the rest of
+            the compilation stages.
+
+            Compilation order, done for each library.
+            Build-Section-Macros -> Build-Section-Data -> [ Command line data, load data, run contracts/functions ] replacements -> [ Command line data, load data, run contracts/functions ] macros
+        ]
+
+        [ # Link libraries that we need, statically by default. ]
+        [ link Other-Library.These-Names ]
+        [ link Another-Library.An-Inner-Contract ]
+        [ link-some-libraries ] [ # Maybe some macro for linking many libraries, typically encourage discrete links though. ]
+
+        [ # Dynamic Library Linking
+            Dynamic Library Linking should be easy to do. Our binary can tell us at compile
+            time if we have dynamic library linking that doesnt match up. It will also know
+            the file path dynamic libraries should be deployed to and be able to carry that
+            information with them to the node level.
+
+            TODO how do we mark things like this.
+        ]
+        [ link Dynamic-Library [ dynamic true ] ]
+
+        [ bind some-build-config [ Build-Time-Contract.make 10 20 30 ] ]
+        [ bind some-more-config [ Build-Time-Contract.ok 15 25 35 ] ]
+
+        [ some-macro 10 10 ]
+    ] ]
+    [ command-line-data [
+        [ # Command Line Arguments
+            This data cannot be used for templating, since it is used at runtime
+            and not when the file is being compiled. But it can be used globally
+            by other libraries that link to this one. Arguments for a binary
+            are collected into a single data structure that lives deep in the generated
+            code. For better caching, it is recommended to copy these values where they
+            are needed and access them there.
+        ]
+        [ data argument-1 Boolean ]
+        [ data argument-2 Boolean [ default true ] ]
+        [ render-code '[ data { build.some-build-config.some-value } Unsigned-Integer-64 ]' ]
+    ] ]
+    [ load [
+        [ # Load Data
+            We can also create library level global data. This data will be global to the program.
+            Based on accesses, it will attempt to put the data in the best spot possible to improve
+            cache performance TBD.
+        ]
+
+        [ # Dynamic Library Loading
+            This statement accompanies the link statement above. It was marked as dynamic,
+            and so it wasn't included in the static library. It instead needs to be loaded
+            at program start time.
+
+            Binding a variable to the location allows other libraries to use the same
+            path, lowering the chance of a compilation issue where dynamic library paths
+            differ within the same binary.
+        ]
+        [ bind dynamic-library-location '/some/binary/path' ]
+        [ load Dynamic-Library dynamic-library-location ]
+
+
+        [ # Regular data binding
+            Here is some good ole classic data binding. All these values satisfy Compile-Sized,
+            so they reserve the right amount of space. And they do not allocate.
+        ]
+        [ bind some-static-value
+            [ [ Array Unsigned-Integer-64 [ size 50 ] ].zeros ]
+        ]
+        [ bind debug-log [ [ String [ size 50 ] ].new ] ]
+
+        [ code-string '[ data { build.some-build-config.some-value } Unsigned-Integer-64 ]' ]
+
+        [ # Macro data.
+            Here is a code macro that when it runs the anonymous function within,
+            it will capture the returned Ono-Code object and render it in place.
+
+            Allocations can occur in here because this code will expand at compile
+            time, but the generated code cannot allocate because that will run as part
+            of library load.
+        ]
+        [ code [
+            [ bind new-code Ono-Code.new [ mutable true ] ]
+
+            [ some-more-config.iter item [
+                [ new-code.statements.append [ Ono-Statement.from-string '[ bind some-data { item } ]' ]
+            ] ]
+
+            [ return new-code ]
+        ] ]
+    ] ]
+]
+]
+
+
+
+[ # Library Build Process
+    Inject build variables into the library
+    verify links we are pulling in are built, if not, go do those first
+    process macros for build data
+    evaluate any build data statements post-expansion
+    go to load and run data and expand those macros, with build data
+    compile data
+    post-processing/aspects to apply to objects in the library
+]

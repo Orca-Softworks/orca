@@ -1,0 +1,7 @@
+this is a special datum type that represents information
+about the class
+[ contract Static-Size
+    [ data [
+        [ datum size u64 static-[ true ] ]
+    ] ]
+]

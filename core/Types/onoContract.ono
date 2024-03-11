@@ -1,0 +1,87 @@
+ [ contract Ono-Contract
+    [ part parts Vector-[ Ono-Part ] max-len-[ 10 ] ]
+    [ part memory-padding Boolean default-[ true ] ]
+    [ part type-tags [ Vector Ono-Type ]
+        [ # Templating contracts allows the user to template
+            the contract and its fields simply. Heres an example.
+
+            [ contract My-Contract
+                [ templates [
+                    [ part T Some-Contract ]
+                ] ]
+                [ part [
+                    [ datum my-field T ]
+                ] ]
+            ]
+
+            This is essentially the same as
+
+            [ code [
+                [ bind code Ono-Code.new [ mutable true ] ]
+
+                [ Some-Contract.implementers.iter item [
+                    [ code.add-contract-from-string
+                        [ template '
+                        [ contract My-Contract
+                            [ part [
+                                [ datum my-field { item.name } ]
+                            ] ]
+                        ]'
+                        ]
+                    ]
+                ]
+            ] ] ]
+
+            These type tags can be used for templating, but they can also
+            be simple type restrictions such as units. The build system
+            will then fail to compile if values of differing unit (or non-convertable)
+            units are mixed.
+        ]
+    ]
+
+    [ compose Ono-Common-parts ]
+
+    [ compose Static-Size
+        [ # Overriding parts
+        You can override each part of the part. In this case, we don't
+        override 'info', so it will stay the same. ]
+
+        [ part some-actual-part Unsigned-Integer-64
+            [ default 5 ]
+        ]
+
+        [ # Implementing Virtual Functions
+        You must implement the virtual functions of the contract being
+        composed in order to satisfy it. ]
+
+        [ function size Unsigned-Integer-64 [
+            [ sum parts  ]
+        ] ]
+    ]
+
+    [ part runtime-type-info Boolean
+        [ default false ]
+
+        [ # Runtime Type Information
+        Runtime type information can be included as an opt-in feature in
+        order to allow dynamic dispatch at runtime. It is guarded behind
+        this flag because users should explicitly know when they are using
+        it. Know that this can cause runtime type errors to happen and
+        they need to be handled. It is highly recommended that you make
+        use of enumerations before using dynamic dispatch. ]
+    ]
+]
+
+[ # Templating Types
+    [ String [ size 50 ] ] example of macro contract. contract is a macro that will spit out a Ono-Type.
+
+    [ Array UInt-64 [ size 100 ] ]
+
+    [ contract Array
+        [ field Inner-Shape Sized ]
+        [ field size [ Option Unsigned-Integer-64 ] [ default none ] ]
+
+        [ part ]
+    ]
+]
+

@@ -1,0 +1,8 @@
+[ part
+    [ Declaration
+        [ Name ]
+        [ Value ]
+        [ Type [ default None ] ]
+    ]
+]
+

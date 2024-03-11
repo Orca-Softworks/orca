@@ -1,0 +1,14 @@
+[ contract Ono-Binary
+        info-[ This contract is one of the core pieces of the Ono code model. ]
+
+        [ data libraries Vector-Ono-Library
+            info-[ The libraries that compose this binary. ]
+        ]
+
+        [ data max-call-stack-size Option-[ u32 ]
+            info-[ Set the maximum call stack size before ending the process. ]
+            default-[ none ]
+        ]
+
+        [ compose Ono-Common-datas ]
+    ]

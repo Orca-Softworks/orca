@@ -1,0 +1,19 @@
+[ library One-Of
+    [ # The One-Of contract allows you to store multiple variants of a type
+    within a single type. The One-Of will by default take on the shape
+    of a Unsigned-Integer-8. However, each of its parts can be a different
+    type. There can be functions associated with a One-Of, the same as
+    a normal Contract. ]
+
+    [ function One-Of Ono-Code
+        macro-[ true ]
+
+        [ data variants Array-[ Ono-Type ] ]
+
+        [
+            [ template [
+
+            ] ]
+        ]
+    ]
+]

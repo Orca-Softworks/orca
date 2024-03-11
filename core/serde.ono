@@ -1,0 +1,8 @@
+[ library Serde
+
+    [ contract Serde
+        [ function serialize ]
+        [ function deserialize ]
+    ]
+
+]

@@ -1,0 +1,35 @@
+#Parts[
+    As[
+        #[We dont have anything to declare in these parts.]
+        #Smear[]
+        #Parts[]
+
+        #[Use condition on to explain when this part is going to be
+        templated on some other type. As in, this part "shape" will
+        be allowed as long as we satisfy the Is[Sized] condition.
+        ]
+        #ConditionOn[A[#Is[Sized]]]
+
+        #Functions[
+            As[
+                #[Users must fill in hollow part functions themselves.]
+                fillIn[true]
+                #[You can template using this tag.]
+                #ConditionOn[B[#Is[Sized]]]
+                #Parts[
+                    [as A consumeSelf[true]]
+                ]
+                #Body[
+                    [# Raw create a data instance. Could use runtime or meta functions
+                    to do this as well.]
+                    B[
+                        somePart[a.someData]
+                    ]
+                ]
+                #
+            ]
+        ]
+        #[You may use this function in any environment.]
+        #Usable[build run test]
+    ]
+]

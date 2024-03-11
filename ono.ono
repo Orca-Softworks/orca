@@ -1,0 +1,290 @@
+[# This is a standard way to organize a Ono Library.
+An Ono Library consists of many sections of code that will be
+processed in multiple passes of macros.
+
+This file will be processed as a library. Macros will ingest some text, parse it into pieces
+of actual data, which then get passed to other macros.
+If a macro returns None, it will stop the chain of text production. If a macro returns
+Some, it is passed to the next layer of macro invocations.
+
+
+
+
+
+
+An Ono file is a library. The idea behind there being a single
+file for a library is the attempt to keep them small.
+It's not a problem if a library is large, but splitting
+them up makes them easier to read.
+
+Each library is made up of these fields:
+
+[#ExternalStatements]
+[#LinkStatements]
+[#PartDefinitions]
+[#UnionDefinitions]
+[#FunctionDefinitions]
+[#ProcessDefinitions]
+[#ArgumentDefinitions
+    [debugInfo Boolean [default False] [usable build]]
+]
+[#OnBuildStatements]
+[#OnLoadStatements]
+[#OnTestStatements]
+
+Macros are #PascalCase with a hash in front of the name.
+Functions and Data type names are PascalCase.
+Variable/data names are all camelCase.
+
+External libraries, libraries we are linking to, definitions
+for various types of data and functions, declarations
+of binary targets, arguments (for build, run, and test),
+and on-* sections to define what the library should do at
+each point in its lifecycle.
+
+A library attempts to manage three important parts of the
+code lifecycle: build, run, and test. It does this via a
+field on each definition called 'usable'. See usable.ono
+for more information.
+
+Because the information laid out in this file IS the library data,
+you can use macros that wrap the whole library to add data
+automatically, such as definitions or declarations. This
+would be done via a macro invocation wrapping the library itself.
+
+The rest of this file is laid out as both an example and as
+a real library you can use ono tooling to inspect and build,
+run, and test.
+]
+
+[#ExternalStatements
+
+]
+
+
+
+
+[#PartDefinitions
+    [NormalParts
+        [# We leave this in here so its clear they are blank.]
+        [#Template]
+        [#Smear]
+        [#Macro]
+
+        [#Parts
+            [# State, as in anything that actually holds some data, is not capitalized.
+            So a variable or a input Part to a Function
+            Definitions are capitalized, such as Parts, Functions, and Macros]
+            [myState Float[Milli-Seconds]
+                [You can template the types of different numbers
+                In the case of templating with the Milli-Seconds Parts,
+                we will only be able to perform operations on numbers of
+                the same type or one we can convert to. You can template
+                on any other type and implement behavior. In this way, you
+                can restrict the usability of the data or expand it, based
+                on the Parts you specify.]
+                [default 142.12]
+           ]
+       ]
+
+        [#Function
+            [PrintState
+                [
+                    [# We can easily template a string using curly braces.
+                    Escape them with the escape characters as needed \{\}]
+                    [#Print 'print this { myState }']
+                ]
+                [returns nothing]
+                [inline true]
+           ]
+       ]
+   ]
+
+    [TemplateParts
+        [#Function]
+        [#Macro]
+
+        [#Template
+            [X SomeParts]
+            [# You could specify Types this way, but idk why.]
+            [Y Float]
+       ]
+
+        [#Smear
+            [# You can perform overrides of smears like this.]
+            [#MyParts
+                [#Parts
+                    [someOverrideField [default 2]]
+               ]
+                [#Function
+                    [SomeOverrideFunction]
+               ]
+           ]
+       ]
+
+        [#Parts
+            [myType X]
+            [anotherType Y]
+            [# this will use the word size of your target machine.]
+            [someValue Integer]
+       ]
+   ]
+
+
+]
+
+
+[#FunctionDefinitions
+
+
+   
+]
+
+
+[#ProcessDefinitions
+    [# You declare binaries in the library as well.]
+    [Smear [# TODO: do we need smear here?]]
+    [Parts]
+
+    [main
+        [Body .Function.main]
+   ]
+
+    [main-two
+        [Smear]
+        [Visibility test]
+        [Parts
+            [input-data some-input]
+       ]
+        [Body
+            [.Function.main [some-input input-data]]
+       ]
+   ]
+]
+
+[#On-Build-Statements
+    [# Build Phase
+    The library build phase will be run for each library before the
+    rest of the compilation work for the libraries. This is to
+    unroll any macros used here (very typical in build functions).
+
+    So if the compiler doesnt know about the function in its database
+    it will just bind the data you have to a variable name. So you
+    dont need to declare it with a function call. Variables just get
+    created.
+
+    Dont worry, if you are using a function as the first argument,
+    the compilation will fail to compile.]
+
+    [more-data [multiply 2.0 Some-Library.Build.data]]
+
+    [# Not allowed because we need the data returned to be bound
+    to a variable name in some way.]
+
+    [some-function-call ...]
+
+    [# Lets make some other data.]
+
+    [main-data True]
+
+    [here [
+        '{ name }.{ call } { argument } { argument } { keyword-argument }'
+   ]]
+
+    [# code is the basic macro. You assemble some code
+    and then return the code object. most of the time you will
+    just use a string to insert into the source. sometimes
+    you will create a code object.]
+
+    [# macros do not indent. focus more on whats inside.]
+    [CODE [
+    [some-code Code.new]
+    [[range 0 10].iter number [
+        [some.code.add-declaration
+            [Code.from 'my-conditional-data more-data']
+       ]
+   ]]
+    [RETURN some-code]
+   ]]
+
+    [# You can also have associated macros. So this macro is associated
+    with the part itself.]
+    [Ono-Parts.Build.Declaration.here [
+    [my-conditional.set main-data]
+    [match my-conditional [
+        [True [
+            [RETURN [Ono-Declaration.from-string '[my-conditional-data more-data]']]
+       ]]
+   ]]
+   ]]
+]
+
+[#On-Load-Statements
+    [# Load Phase
+    You can depend on load variables because they are global constants
+    and will be guaranteed to exist. They are instantiated at library
+    load time.
+
+    The load section is where you load dynamic libraries. The load will
+    only occur once for the entire program.]
+
+    [# Using Build Parts + Global Variable
+    Use the data from the build phase easily! In this case,
+    we use it to create a global variable for the program.]
+
+    [some-global-data Build[more-data]]
+
+    [# Load Dynamic Libraries
+    Perform the work of loading the dynamic library we linked to
+    above! This will be checked by the binary target to ensure all
+    loads of this library from the same file path.]
+
+    [load Dynamic-Library [path dynamic-library-path]]
+    [load External-Library [path dynamic-external-path]]
+]
+
+[#On-Test-Statements
+    [RETURN]
+]
+
+
+[#Function
+    [And
+        [#Template
+            T IsBoolish [# <- that is a virtual part type]
+       ]
+        [#Part
+            [arrayOfInputs Array[T]]
+       ]
+        [#Body
+            [isBool B'00000001' [mutable true]]
+            [count 0 [mutable true]]
+
+            [#Loop [
+            [#Match [arrayOfInputs.At count]
+                [Some.boolish [
+                    [addedBoolean [#Add isBool boolish.AsBoolean]]
+                    [#If [addedBoolean.EqualTo B'00000001'] [#Out false]]
+               ]]
+                [None []]
+           ]
+            [count.PlusEquals 1]
+           ]]
+
+            [#Out true]
+       ]
+
+   ]
+]
+
+[#Macro
+    [# A macro is defined with no # used, but must be invoked via #]
+    [And
+        [#Part
+            [collectPartsInto arrayOfInputs Array[T]]
+       ]
+        [#Body [
+            [#OnoCode.FromString '[And { arrayOfInputs }]']
+       ]]
+   ]
+]

@@ -1,0 +1,8 @@
+[ # function call ]
+[ 1.add 2 ]
+[ # function call ]
+[ 2.subtract 1 ]
+[ # macro call ]
+[ sum 1 2 3 4 5 ]
+[ # assignment ]
+[ my-variable 12.3 [ type Floating-Point-32 ] ]

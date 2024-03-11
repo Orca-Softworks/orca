@@ -1,0 +1,82 @@
+[ contract Ono-Function
+    [ # This contract is one of the core pieces of the Ono code model. ]
+    [ compose Ono-Common [
+        [ # Implementations that override Ono-Common ]
+    ] ]
+
+
+    [ data datas Vector-[ Ono-data ]
+        default-[ Vec-empty ]
+        [ # ]
+            The different input datas that allow the function to satisfy
+            its returns contract.
+        ]
+    ]
+
+    [ data allocator [ Option Allocator ] [ default none ]
+        [ # Allocators
+        The allocator that will perform allocations within the function.
+        This is required for functions that allocate. There is a std allocator
+        object in the load state of Std. Access like [ Std.load.allocator ].
+        Std.load.allocator exists, but other allocators could be created and
+        used.
+
+        Enforcement of use of an allocator can be done at the binary level.
+        Those that do not require an allocator are the default. ]
+    ]
+
+    [ data deterministic Boolean [ default false ]
+        [ # Determinism
+        This argument specifies if the function will have a deterministic output.
+        Same inputs create the same outputs. By default this is false in order to
+        make people think about it if they are going to pull them into the "build"
+        phase of a library.
+
+        Ultimately, however, it is up to the code authors to test and maintain this. ]
+    ]
+
+    [ data cache Boolean default-[ false ]
+        [ # Caching
+            You can opt in to function caching by using a boolean.
+            This will do a shallow copy check of the values being input
+            to see if they exist in the cache. If so, itll return right
+            away with the value.
+
+            You can also change the cache key behavior by TBD
+        ]
+    ]
+
+    [ data returns Option-[ Ono-Data-Type ]
+        default-[ none ]
+        info-[
+            The type of contract this function will satisfy when called.
+        ]
+    ]
+
+    [ data inline Boolean
+        default-[ false ]
+        info-[
+            Whether or not to inline this function every call. Typically
+            only used with smaller functions.
+        ]
+    ]
+
+    [ data macro Boolean
+        default-[ false ]
+        info-[
+            If this function is going to be evaluated as part of the
+            compilation process.
+        ]
+    ]
+
+    [ data static Boolean
+        default-[ false ]
+        info-[
+            If this is a static function whose output value will be known at
+            compile time. This is how we associate
+
+            TODO: could maybe use like compile-time/macro for this?
+            TODO: lets use a more clear term for this.
+        ]
+    ]
+]

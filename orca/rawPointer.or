@@ -1,0 +1,28 @@
+#Parts[
+    Contains[
+        #[We dont have anything to declare in these parts.]
+        #Smear[]
+        #Parts[]
+
+        #Functions[
+            Contains[
+                #[Users must fill in hollow part functions themselves.]
+                fillIn[true]
+                #[You can template using this tag.]
+                #ConditionOn[A[#Is[Sized]]]
+                #Parts[
+                    [possiblyContainedData SafePointer[A]]
+                ]
+                #Body[
+                    [# Raw create a data instance. Could use runtime or meta functions
+                    to do this as well.]
+                    B[
+                        somePart[a.someData]
+                    ]
+                ]
+                #
+            ]
+        ]
+        #Usable[build run test]
+    ]
+]

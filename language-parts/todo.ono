@@ -1,0 +1,113 @@
+[ # TODO
+    1. Move these into their own files.
+    2. 
+]
+
+[ macro-Call
+    [ Name ]
+    [ Required-arguments ]
+    [ Optional-arguments ]
+]
+
+[ argument
+    [ Piece ]
+    [ Piece ]
+    [ Piece ]
+]
+
+[ load
+    [ Declaration ]
+    [ Declaration ]
+    [ Declaration ]
+]
+
+
+[ union
+    [ Smears ]
+    [ Template ]
+    [ Piece ]
+    [ function ]
+    [ macro ]
+]
+
+[ part
+    [ Smears ]
+    [ Template ]
+    [ Piece ]
+    [ function ]
+    [ macro ]
+    [ Public ]
+    [ Heap ] [ # will always allocate and return a pointer. use sparingly.
+    in the build phase, this is set automatically true. ]
+    [ Metadata
+        [ # Extra data used in dynamic runtimes. TBD on removal. ]
+    ]
+]
+
+[ macro
+    [ Smear ]
+    [ Template ]
+    [ Piece ]
+    [ Body ]
+    [ Public ]
+    [ Deterministic ]
+    [ Heap ]
+]
+
+[ function
+    [ Smears [ default None ] ]
+    [ Template ]
+    [ Piece ]
+
+    [ Returns [ default None ] ]
+
+    [ Body [ default None ] ]
+
+    [ Public [ default false ] ]
+    [ Recurses [ default false ] ]
+    [ Deterministic [ default false ] ]
+    [ Allocator [ default None ] ]
+    [ Cache [ default None ] ]
+
+]
+
+[ process
+    [ Body ]
+    [ Returns ]
+    [ Smears ]
+    [ Public ]
+    [ Recursion
+        Boolean
+        [ default True ]
+        [ # If this process allows recursion. ]
+    ]
+    [ Allocator
+        Boolean
+        [ default Some[Std.Run.Heap] ]
+        [ # If this process will allocate memory via the macro or a Heap
+        part. If set False, all parts must not allocate and the allocate macro
+        is not allowed. ]
+    ]
+    [ Only-Allocate-On-load Boolean [ default False ] ]
+    [ Task
+        Boolean
+        [ default True ]
+        [ # Distinguish if this process is meant to be long lived or discrete.
+        Anything used in Build and Test needs to be discrete. ]
+    ]
+]
+
+[ # loop is a macro, so dont indent ]
+
+
+[ some-int Integer 0 ]
+
+[ loop loop-name
+[ some-int.add 1 ]
+
+[ print 'Hello { some-int }' ]
+[ match some-int
+    [ some-int.greater-than 10 ] [ break loop-name ]
+    - [ ]
+]
+]

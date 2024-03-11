@@ -1,0 +1,18 @@
+[ contract Ono-Common-datas
+        [ data name String
+            max-len-[ 50 ] [ # TBD on this kwarg or how we specify it for a string. ]
+            info-[ The name of the item. Keep it short! ]
+        ]
+
+        [ data usable Usable
+            default-[ private ]
+            info-[
+                At what level this item is visible. Does not apply to usable-[ test ]
+                items that depend on it.
+
+                An item with test usable can only be depended on by other
+                items marked test usable. So a test library can be used by
+                another test library, but a binary cannot use a test library.
+            ]
+        ]
+    ]

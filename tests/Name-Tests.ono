@@ -1,0 +1,7 @@
+[ library Name-Tests
+    usable-[ test ]
+
+    [ function namespace-name-is-capitalized
+        usable-[ test ]
+    ]
+]

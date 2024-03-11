@@ -1,0 +1,52 @@
+[ Build
+    [ External ]
+    [ Link ]
+
+    [ Part ]
+    [ Union ]
+    [ Function ]
+    [ Macro ]
+    [ Process ]
+
+    [ Argument ]
+    [ Load ]
+    [ Unload ]
+    [ Post ]
+]
+[ Run
+    [ Part ]
+    [ Union ]
+    [ Function ]
+    [ Macro ]
+    [ Process ]
+
+    [ Argument
+        [ automatic-promise-allocation Boolean
+            [ default True ]
+
+            [ # We are going to allocate a dynamically sized
+            vector at load time that all promises go into. ]
+        ]
+    ]
+    [ Load
+        [ promise-allocator [ match .Run.automatic-promise-allocation
+            [ True [ Promise Allocator.new ] ]
+            [ False [ Faily-Promise-Allocator.new ] ]
+        ]
+    ]
+    [ Unload ]
+]
+[ Test
+    [ External ]
+    [ Link ]
+
+    [ Part ]
+    [ Union ]
+    [ Function ]
+    [ Macro ]
+    [ Process ]
+
+    [ Argument ]
+    [ Load ]
+    [ Unload ]
+]

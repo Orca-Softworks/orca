@@ -1,0 +1,236 @@
+#[welcome to the Orca language.
+I call it Orca because Orca are cool and amazing and this programming
+language is supposed to help make them not go extinct.
+
+Here are the different sections of a library.
+
+#Externals[]
+#Links[]
+#Arguments[]
+#Parts[]
+#Renames[#[TODO: do i need to include typealiasing in here too?]]
+#Unions[]
+#Functions[]
+#Processes[]
+
+#OnBuild[]
+#OnLoad[]
+#OnTest[]
+
+Youll find out more about them as we go.]
+
+#Externals[
+    externalLibrary[
+        releaseExact[145]
+        uri['https://some-file-server']
+    ]
+
+    externalLibrary1[
+        releaseAfter[145]
+        uri['https://some-github']
+    ]
+
+    externalLibrary2[
+        releaseAfter[68]
+        releaseBefore[145]
+    ]
+]
+
+#Links[
+    #[Any libraries that you need to link to. You can depend on
+    build variables, load variables (!), Parts, and functions.]
+
+    externalLibrary[dynamic[true]]
+    staticLibrary[]
+    dynamicLibrary[dynamic[true]]
+    someLibrary[]
+]
+
+#ArgumentDefinitions[
+    #[Create A Program Argument
+
+    You can create a program argument that will be required or
+    optional when the binary is started. These can then be assembled
+    and listed with 'ono binaryName.Run.Arguments[]']
+
+    #[Boolean Parts of a input function can either be true on existence, such as build
+    run and test here, or take the passed in value to them like build[true] or build[data.boolean]
+    some trait. In this case, the trait is templated to say that the]
+
+    dynamicLibraryPath[Path build run test
+        default[Path.new['/bin/ono/libraries/dynamicLibrary/dynamicLibrary.o']]
+    ]
+
+    dynamicExternalPath[Path build
+        default[Path.new['/bin/ono/libraries/externalLibrary/externalLibrary.o']]
+    ]
+
+    someRuntimeArgument[Boolean run
+        default[False]
+    ]
+
+    someTestArgument[Boolean
+        test default[False]
+    ]
+]
+
+#Unions[
+    [# Unions
+    A union is the term here for enumeration. I like Union because
+    it helps get across that the memory is shared between all shapes.
+    So the largest one will be the size of data. So try to keep them
+    within the same order of magnitude in size! The compiler will warn of
+    enums whos min/max sizes are too large in between.]
+
+    [SomeUnion
+        [#Smear]
+        [#Function]
+        [#Macro]
+
+        [#Template
+            [X Some-Parts]
+       ]
+
+        [#Parts
+            [innerData NormalParts]
+            [anotherData TemplateParts[X]]
+       ]
+   ]
+
+    [Boolean
+        [#Smear]
+        [#Function]
+        [#Macro]
+        [#Template]
+
+        [#Parts
+            [true 'B_0000_0001']
+            [false 'B_0000_0000']
+       ]
+   ]
+]
+
+#Functions[
+    #[Functions are what do work on data. They optionally return data.
+    They can be inlined in-situ or at the definition. so when you call
+    a function you will automatically get access to certain keyword arguments.
+    that will change how the program uses the function.
+
+    Functions may also be optionally marked as metaProgramming.]
+
+    MyFunction[
+        #[Use the #FillOut macro to satisfy the contract that a Part specifies.]
+        #FillOut[]
+
+        #[ConditionOn is similar to templating in Rust or C++. You condition this
+        function as being accessible for these types of Parts.]
+        #ConditionOn[]
+
+        #Parts[
+            [someFunctionData Boolean]
+            [someOtherData Boolean [default true]]
+        ]
+
+        #Body[
+            [# Functions with a single statement return that data.]
+            [#And someFunctionData someOtherData]
+        ]
+
+        #Out[
+            Boolean
+        ]
+   ]
+
+    [MyFunction
+        [#Smear]
+        [#Template]
+        [deterministic true]
+        [#Parts
+            [someFunctionData Boolean]
+            [someOtherData Boolean [default true]]
+       ]
+
+        [#Body
+            [# Functions with a single statement return that data.]
+            [#And someFunctionData someOtherData]
+       ]
+
+        [#Out Boolean]
+   ]
+
+    [SomeFunction
+        [#Smear]
+        [#Template]
+        [#Deterministic]
+        [#Visibility]
+        [#Parts]
+        [#Body]
+        [#Out]
+   ]
+
+    [Main
+        [Smear]
+        [Template]
+        [Parts
+            [some-input Boolean [Default true]]
+       ]
+        [Body
+            [# You can call functions inside templates.]
+            [print 'Hello World! Is the sky blue? { [
+                [# Match statements let you check Unions.]
+                [match some-input
+                    [True "yes"]
+                    [False "no"]
+               ]
+           ] }']
+       ]
+   ]
+
+   [# Macros are a form of Function. These are what make up the syntax
+   of the whole language and allow it to essentially create its own layers/
+   intermediate representations without the need for formalizatons of those layers
+   as languages themselves.]
+   [SomeMacro
+        [#Smear]
+        [#Template]
+        [#Deterministic]
+        [#Visibility]
+        [#Parts]
+        [#Body]
+        [# This function will execute on the first pass of the metaProgram processor.
+        Think of this processor as a sort of scanner. It scans the text, then when it
+        sees a Function call being invoked via '#SomeMacro']
+        [metaProgramLevel 0]
+        [# Functions invoked via the MetaProgram processor must return OnoCode
+        of sorts. This object can be assembled via a String (slow) or created via
+        the different Parts that ]
+        [#Returns OnoCode]
+   ]
+
+    SomeFunction[
+        #Part[]
+        metaProgram[true]
+        #Out[Integer]
+    ]
+]
+
+#[The #Parts macro is used commonly, and transforms this syntax]
+#Parts[
+    somePartName[...]
+]
+#[into this syntax, the actual writing out of the data]
+parts[
+    ['somePartName' [...]]
+]
+
+common pattern for variables
+
+struct implements set and get functions
+
+parent.innerData.Get[]
+parent.innerData.Set[]
+
+parent could also describe a function in case it needs to set innerData according
+to its data
+
+parent.SetInnerData[]

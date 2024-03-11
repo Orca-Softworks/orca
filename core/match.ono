@@ -1,0 +1,5 @@
+[ # Match
+    Allows you to deconstruct a oneof
+    done with all kinds of things, including booleans, there is no if else
+    statement
+]

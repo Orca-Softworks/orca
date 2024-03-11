@@ -1,0 +1,38 @@
+[ # Templating Views
+        [ render-template
+            '
+            [ contract SizedString-{ T }
+                [ data characters Array-[ Utf-8-Character ] ]
+                [ data size Unsigned-Integer-64 ]
+            ]
+            '
+            T-[ satisfies include-[ Some-Contract ] exclude-[ Some-Other-Contract ] ]
+        ]
+
+        [ contract AllocatedString
+            [ data char-array Array-[ Utf-8-Character ] ]
+            [ data size Unsigned-Integer-64 ]
+        ]
+
+        [ contract String
+            [ function sized
+                returns-[ SizedString ]
+
+            ]
+            [ function allocated
+                returns-[ AllocatedString ]
+
+            ]
+        ]
+    ]
+
+    [ function string
+        returns-[ [ one-of SizedString AllocatedString ] ] [ # keyword arguments first. ]
+
+        [ data string Option-[ String ] default-[ none ] ]
+        [ data size Option-[ Unsigned-Integer-64 ] default-[ none ] ]
+
+        [
+            [ if size-[ is-some ] SizedString-[ '' ]]
+        ]
+    ]

@@ -1,0 +1,11 @@
+[ part
+    [ Piece
+        [ Name String ]
+        [ Type Ono-Part ]
+        [ Default Ono-Part ]
+        [ Visibility ]
+
+        [ usable build ]
+        [ visibility public ]
+    ]
+]

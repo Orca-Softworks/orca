@@ -1,0 +1,12 @@
+pointer is a raw memory address that does not require checking for
+something to be available behind the pointer.
+
+should really only be used for objects that are going to be pinned in
+memory, such as variables declared in load or those that were pinned
+manually
+
+[ datum smart Boolean default-[ true ] ] ( if it should do memory management/scope checking)
+[ datum dynamic Boolean default-[ false ] ] (for dynamic casting)
+[ datum pin Boolean default-[ true ] ]
+
+also need atomics, mutex, reference counted, etc..

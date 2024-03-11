@@ -1,0 +1,11 @@
+inspect:
+	objdump -s test.o
+
+to_object:
+	nasm -felf64 test.asm
+
+to_executable: to_object
+	ld test.o -o test
+
+run: to_executable
+	./test

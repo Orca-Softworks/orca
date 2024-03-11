@@ -1,0 +1,23 @@
+[ library Test
+    usable-[ test ]
+
+    [ function test
+        returns-[ Ono-Code ]
+        macro-[ true ]
+
+        [ compose function
+            name-[ function-datas ]
+
+            [ data usable default-[ test ] ]
+        ]
+
+        [ Ono-Code-[ from-string ]
+            [ template
+                '
+                [ function { [ spread function-datas ] } ] [ # write the function definition. ]
+                [ { name } ] [ # Call the function. ]
+                '
+            ]
+        ]
+    ]
+]

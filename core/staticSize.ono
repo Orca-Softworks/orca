@@ -1,0 +1,13 @@
+
+
+[ library Sized
+    [ contract Static-Size
+        [ function size Unsigned-Integer-64
+            [ #
+                Here is a purely virtual function that must be implemented by
+                a contract in order to satisfy this contract.
+            ]
+            [ static true ]
+        ]
+    ]
+]

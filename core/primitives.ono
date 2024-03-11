@@ -1,0 +1,137 @@
+[ library Primitives
+    usable-[ external ]
+
+    [ # Primitives ]
+    Unsigned-Integer-[ 8 16 32 64 128 ]
+    Signed-Integer-[ 8 16 32 64 128 ]
+    Floating-Point-[ 8 16 32 64 ]
+    Boolean
+    AllocatedString
+    SizedString
+    Character
+    StackError
+    HeapError
+
+    [ # Templated Types ]
+    Tuple-[ T T T ]
+    Option-[ T ]
+    Result-[ T ]
+    Array-[ T Option-[ u64 ] ] [ # a Array with size of none will be allocated and growable. ]
+    Pointer-[ inner-[ T ] ]
+    Reference-[ inner-[ T ] mutable-[ Boolean ] ]
+    Map[ key-[ T ] value-[ T ] ]
+
+    [ contract DocString
+        [ function #
+            return-[ Ono-Code ]
+            default-[]
+        ]
+    ]
+
+    [ # Common Macros
+        # Is the comment macro. It allows you to create comments inline with the code.
+        The same symbol is used for docstrings, but those are kwargs to the data, function,
+        contract, library macros.
+
+        data is a singular piece of data of some shape. It can contain more information
+        such as unit (a sort of type constriction), info for context about why it exists,
+        and more. When you use the Ono-Data-Type type, that is a special type constructed
+        at build time that is one of any of the types found in the Library or imported from
+        other libraries.
+
+        Function is something that acts on data. It takes arguments (defined using the datas
+        macro above) and can optionally return some data.
+
+        Contract is a
+    ]
+    [ function #
+        macro-[ true ]
+        [ data name String no-quotes-[ true ] ]
+    ]
+
+    [ function data
+        macro-[ true ]
+        [ data name String-[ size-[ 50 ] ] ]
+        [ data data-type Ono-Data-Type ]
+    ]
+
+    [ function contract ]
+
+    [ function function
+        [ data name String-[ size-[ 50 ] ] ]
+        [ data macro Boolean default-[ true ] ]
+        [ data cache Option-[ FunctionCache ] default-[ none ] ]
+        rest-of-datas-bind-to-[ [ data datas Vector-[ Ono-data ] ]
+    ]
+
+
+
+
+    [ function bind
+        [ data name String-[ size-[ 50 ] ] ]
+        [ data value Any ]
+        [
+            TBD
+        ]
+    ]
+
+    [ function mutate
+        [ data name ]
+
+    allocate
+    pin
+
+    oneof
+    match
+
+    copy
+    move
+    reference
+
+    [ # Looping
+        Here are some helpful
+    ]
+    [ function loop
+        macro-[ true ]
+        [ data name Option-[ String ] default-[ none ] ]
+        [
+            TBD
+        ]
+    ]
+
+    [ function break
+        #-[ TODO ]
+        macro-[ true ]
+        [ data name Option-[ String ] default-[ none ] ]
+        [
+            [ return ]
+        ]
+    ]
+
+    [ function continue
+        #-[ TODO ]
+        macro-[ true ]
+        [ data name Option-[ String ] default-[ none ] ]
+        [
+            TBD
+        ]
+    ]
+
+    [ # Return
+        The return statement is necessary when a code context has more than
+        one line. It will dictate when the context is exited and the type of
+        data that is returned.
+    ]
+    [ function return
+        #-[ TODO ]
+        macro-[ true ]
+        [ data return Optional-[ Ono-Contract ] default-[ none ] ]
+    ]
+
+    [ # Compose
+        The compose statement will compose either Contracts or Functions.
+        It will take datas of one Contract or Function and use them in
+        whatever is being composed.
+    ]
+    compose
+]

@@ -1,0 +1,26 @@
+[ library Template
+    [ function render-template
+        #-[
+            The template function will allow you to take a string of text and
+            create a template out of it.
+        ]
+        returns-[ Result-[ String ] ]
+        dynamic-keyword-datas-[ true ] [ # Allows the user to specify whatever number of kwargs they want. ]
+
+        [ data template-string String ]
+        [ data replacement-string String default-[ '{ * }' ] ]
+        [ data use-all-keyword-datas Boolean default-[ true ] ]
+
+        [
+            [ # Template Strings
+                '[ bind { [ if true 1 else-[ 2 ] ] } ]' the code inside the {  } will be
+                executed when the template is rendered. Other code in the string will not.
+
+                This is similar to jinja, but we don't need different 'replace' and 'statement'
+                symbols due to ono dropping values out of contexts. You can use
+            ]
+
+            [ bind matches [ template-string-[ find-matches ] '{ }' ] ]
+        ]
+    ]
+]

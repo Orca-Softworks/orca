@@ -1,0 +1,27 @@
+#Processes[
+    BuildOrcaLibrary[
+        name['myBuildTarget]
+        #Body[
+            Orca.#Build[
+                'some/target/path'
+                buildVariableOne[15]
+                anotherVariable['yes']
+            ]
+        ]
+        #Usable[build]
+    ]
+
+    RunOrcaProgram[
+        name['myRunTarget']
+        #Body[
+            Orca.#Run[
+                'some/target/path'
+                runVariableOne[10]
+                yesVariable['yes']
+            ]
+        ]
+        #Usable[build]
+    ]
+]
+
+can then invoke Orca.#Run['myRunTarget'] and it would use those input arguments.

@@ -1,0 +1,27 @@
+
+
+[ contract Ono-Datum
+    [ datum name [ Ono-Name Lowercase ] ]
+    [ datum types [ Vector Ono-Contract ]
+        [ # There can be multiple constricting types such as data type and
+            unit type. There can be other Ono-Contracts included.
+        ]
+    ]
+    [ datum default T ]
+
+    [ data static Boolean
+        default-[ false ]
+        info-[
+            If this is a static function whose output value will be known at
+            compile time. This is how we associate
+
+            TODO: could maybe use like compile-time/macro for this?
+            TODO: lets use a more clear term for this.
+        ]
+    ]
+]
+
+[ contract [ Contract-Name ]
+    [ datum data-1 [ Unsigned-Int-64 ] [ default 1 ] ]
+    [ datum data-2 [ Floating-Point-64 Kilo-Meter ] [ default 1.0 ] ]
+]

@@ -1,0 +1,33 @@
+[ library Cli-Tests
+    usable-[ test ]
+
+    [ use Test-[ test ] ]
+
+    [ function cli-shows-module-settings
+        usable-[ test ]
+        [ return ]
+    ]
+
+    [ function cli-renders-macros
+        usable-[ test ]
+        [ return ]
+    ]
+
+    [ function cli-runs-expressions
+        usable-[ test ]
+        [ return ]
+    ]
+
+    [ function cli-shows-module-settings
+        usable-[ test ]
+        [ return ]
+    ]
+
+    [ function cli-shows-module-settings
+        [ return ]
+    ]
+
+    [ function cli-shows-module-settings
+        [ return ]
+    ]
+]
