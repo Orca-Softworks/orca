@@ -1,0 +1,4 @@
+libraries[
+    #[you can use the ~ to represent the top level of the directory tree.]
+    ~/repo/
+]

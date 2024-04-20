@@ -234,3 +234,159 @@ parent could also describe a function in case it needs to set innerData accordin
 to its data
 
 parent.SetInnerData[]
+
+#[
+Orca uses Forms and Functions in order to.
+]
+
+SomeLibrary [
+    Some.Library.or
+    #[Query or index using 'build/Some1.Form'. All macros end up creating some set of files.]
+    Build [
+        #[The #Form or #Function macros would generate files corresponding to an actual Form
+        or Function object. They are generated via #Form and #Function macros.
+
+        Files are always of the form: 'Name/Type/Type/Type/*.or'. ]
+
+        Some1 [
+            Form.or
+            Function.or
+        ]
+
+        Some2 [
+            Form.or
+        ]
+
+        Some3 [
+
+        ]
+    ]
+
+    Run [
+
+    ]
+
+    Test [
+
+    ]
+]
+
+#Library[
+    #Externals[
+
+    ]
+    #Links[
+        Std/Usable/forms/*
+        Std/Boolean/forms/*
+    ]
+    #Arguments[
+        funArgument[Boolean default[true]]
+    ]
+    #Forms[
+        UnionForm[
+            #[Access these like UnionForm/pieceOne]
+            forms[
+                pieceOne
+                pieceTwo
+            ]
+            union
+            usable[build, run]
+        ]
+    ]
+    #Functions[]
+    #Processes[]
+
+    #OnBuild[]
+    #OnLoad[]
+    #OnTest[]
+]
+
+file types:
+Form, describes some construct of data, some shape of data
+Function, describes how Forms can be transformed into others
+External
+Link
+Library
+Argument
+
+Boolean/
+    .Form.or
+    Forms/
+        True/
+            .Form.or
+            #[.Form.or:
+                shape[u8]
+            ]
+        False/
+            .Form.or
+
+    Functions/
+        And/
+            .Function.or
+            InputForms/
+                Boolean.or
+            OutputForm/
+                Boolean.or
+        Or/
+            Function.or
+            InputForms/
+                Boolean.or
+            OutputForm/
+                Boolean.or
+
+boolean/forms/true/and[]
+
+Integer/
+    .Form.or
+    forms/
+
+
+in Boolean/.Form.or:
+    union[true]
+    usable[run]
+    formsPath[./forms/*]
+
+Bytes/.Form.or:
+    Functions/
+        And/
+        Or/
+        XOr/
+
+project/
+    src/
+        some.Library.or
+        someOtherConfig.txt
+        someRandomConfig.json
+    out/
+        .layers/
+            #[we do macro expansion here to create intermediate files, use symlinks to src files.
+            Each layer can be viewed individually and correspond to macro expansion depth.
+
+            Targets in layer 3 can request to collect all objects in layer 4, such as via
+            myGeneratedTargets/**/targetType.or. These objects can be ]
+            1/
+            2/
+            3/
+            4/
+        someOtherConfig.txt
+        someRandomConfig.json
+        someLibrary/
+            #[fully expanded src files into just library directories containing forms, functions, and
+            processes.]
+            forms/
+                formName1/
+                    form.or
+                    forms/
+                    functions/
+            data/
+            functions/
+            processes/
+
+#library[
+    #link[
+        someLibrary/*
+        someOtherLibrary/*
+    ]
+]
+
+

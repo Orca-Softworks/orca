@@ -1,0 +1,62 @@
+description[
+    '''
+    Some description of what this is.
+    '''
+]
+
+externalRepos[
+    #[Each of these will get downloaded, possibly expanded.]
+    some[url='123.com', sha256='123']
+    thirdparty2[url='123.com', sha256='123']
+    thirdthirdparty[url='123.com', sha256='123']
+]
+
+#[Register any libraries for build time eval and use. Build sections of these libraries
+will be evaluated.]
+libraries[
+    myLibrary,
+    some.Library,
+    thirdparty2.Library,
+    thirdthirdparty.Library
+]
+
+#[Where the repo should look for the file entry point. The repo can only read
+and act on this input, nothing else. Repo.or cannot be inside this directory.]
+input["../input"]
+
+#[Where to deposit repo level macro output after scanning input.]
+repoToProcMacroOutput["./repoToProcMacroOutput"]
+
+repoMacros[
+    [
+        #[
+            Run repo macros on certain directories via file queries such as */ or just
+            Macros return the set of files they touched, so you can chain macros together.
+            Each repo macro writes/reads to a single "repoToProcTransfer" directory. Each
+            macro can see the prior macro's inputs to the directory. These are the files
+            that each proc macro will have access to.
+        ]
+        [
+             myRepo0.myLibrary.#someMacroInvocation1[
+                [*], #[This macro acts on all the files in the repo at this time. You can use other regex as well.]
+                invokeArg1[yes],
+                invokeArg2[No]
+            ]
+            myRepo2.okLibrary.#AnotherMacro[
+                [*] #[This macro acts on all files after the last macro.]
+            ],
+            myRepo1.yesLibrary.#someMacroInvocation2[
+                [*],
+                10000,
+                invokeArg1[[myRepo2.someDir]],
+                invokeArg2[ok],
+            ]
+            #someMacroInvocation3[
+                [myProc.Proc], #[acts on directory myProc.Proc after previous macros]
+                invokeArg1,
+                invokeArg2
+            ]
+        ]
+
+    ]
+]
