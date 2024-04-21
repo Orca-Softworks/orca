@@ -1,17 +1,50 @@
 import typing
 
+NAME = "Neuron"
+# Brain, Neuron, Pyramid, Nw, NNW, Nnw, nnw,
 
-class OrcaComponent:
+RESERVED_WORDS = [
+    "out",
+]
 
-    def __init__(self, name, description="", tags=[]):
+
+# need to use this for parsing rust input files.
+class RustTranslator:
+    pass
+
+
+class Node:
+    def __init__(
+        self,
+        name,
+        description="",
+        tags=[],
+        visibility="**/*",
+    ):
+        # Gives this component
         self.name = name
+        # lets us describe, in human terms, what this does
         self.description = description
+        # allows to append whatever sorts of tags we want to this component
         self.tags = tags
+        # allows us to limit those that can see this part of the network.
+        self.visibility = visibility
+
+        if self.name in RESERVED_WORDS:
+            self.error(
+                f"""Cannot use '{self.name}' as your component name.
+                See the list of reserved Orca words: {RESERVED_WORDS}"""
+            )
+
+    def validate(self):
+        return
 
     def overview(self):
-        return f"""Name: {self.name}
-        Description: {self.description}
-        Tags: {self.tags}"""
+        return f"""
+        name: {self.name}
+        description: {self.description}
+        tags: {self.tags}
+        """
 
     def error(self, message):
         raise BaseException(
@@ -22,18 +55,22 @@ class OrcaComponent:
         )
 
 
-class Input(OrcaComponent):
+class Input(Node):
+    """_summary_
+
+    Args:
+        Node (_type_): _description_
+    """
+
     def __init__(
         self,
-        # The name of this input instance. Used as the variable name inside
-        # the neuron implementation.
-        name,
+        *args,
         # The type of the input. Can translate (sometimes) one type to
         # another.
         input_type,
         # The output we should listen to somewhere else in the graph.
         query=None,
-        # If this input comes from an output somewhere later in the machine.
+        # If this input comes from an output somewhere later in the network.
         feedback=False,
         # If this input should resolve to multiple neurons.
         many=None,
@@ -49,14 +86,14 @@ class Input(OrcaComponent):
         # we can auto generate an input that stores the latest write
         # time for us.
         save_latest_write_time=False,
-        description="",
         keeparound_duration="10_s",
         unit=None,
         track_disconnect=False,
         report_disconnect=False,
         big=False,
+        **kwargs,
     ):
-        OrcaComponent.__init__(self, name, description)
+        Node.__init__(self, *args, **kwargs)
 
         # should be possible to come up with different translations schemes.
         self.input_type = input_type
@@ -71,6 +108,14 @@ class Input(OrcaComponent):
         self.buffered = buffered
         self.persistence = persistence
         self.save_latest_write_time = save_latest_write_time
+        self.keeparound_duration = keeparound_duration
+        self.unit = unit
+        self.track_disconnect = track_disconnect
+        self.report_disconnect = report_disconnect
+        self.big = big
+
+    def validate(self):
+        super().validate()
 
         if self.query == None and self.initial_value == None:
             self.error("Cannot set query and initial value together.")
@@ -84,45 +129,32 @@ class Input(OrcaComponent):
     def overview(self):
         return f"""
         {super().overview()}
-        Type: {self.input_type}
-        Query: {self.query}
-        Initial Value: {self.initial_value}
+        input_type: {self.input_type}
+        query: {self.query}
+        initial_value: {self.initial_value}
         """
 
 
-# # you use a many input when you need to condense a list into
-# # a single output variable.
-# input("many_input", "f64", query="..start_data", many=True),
-# # This is a channel where we always use the output from the last calculation.
-# input("input_state", "=.**.name()", feedback=True),
-# # This is an example of how we can assess
-# input(
-#     "reverse_many_input", "f64", "=.**.section[name].**.*", feedback=True
-# ),
-# # we can have inputs that are simply there for us to use. We can write to our
-# # internal state, but it is never an output to others.
-# input("internal_state", "f32", initial_value=instance_start_value),
-# input("internal_state_read_only", "f32", constant=True),
+class Neuron(Node):
+    """_summary_
 
+    Args:
+        Node (_type_): _description_
+    """
 
-class Neuron(OrcaComponent):
     def __init__(
         self,
-        name,
+        *args,
         output_type,
         impl_file,
-        *inputs,
-        machines=[],
-        tags=[],
-        description="",
+        inputs=[],
+        networks=[],
         multi_cycle=False,
         big=False,
         per_cycle_transmit=None,
         rate_limit_output=None,
         allow_heap=False,
-        allow_spawning_machines=False,
-        # Let anyone see this neuron output.
-        visibility="**/*",
+        allow_spawning_networks=False,
         # Memoize will mean not emitting an output signal
         # if the value has not changed.
         memoize=False,
@@ -130,47 +162,71 @@ class Neuron(OrcaComponent):
         # we do our calculation. If they are not connected, we can take some
         # action.
         connect_inputs=False,
+        **kwargs,
     ):
-        OrcaComponent.__init__(self, name, description)
+        Node.__init__(self, *args, **kwargs)
 
         self.output_type = output_type
         self.inputs = inputs
         self.impl_file = impl_file
-        self.machines = machines
-        self.tags = tags
+        self.networks = networks
         self.multi_cycle = multi_cycle
         self.big = big
         self.per_cycle_transmit = per_cycle_transmit
         self.rate_limit_output = rate_limit_output
         self.allow_heap = allow_heap
-        self.allow_spawning_machines = allow_spawning_machines
+        self.allow_spawning_networks = allow_spawning_networks
+        self.memoize = memoize
+        self.connect_inputs = connect_inputs
+
+    def validate(self):
+        super().validate()
+        return
 
     def overview(self):
         return f"""
         {super().overview()}
-        Type: {self.output_type}
-        Impl: {self.impl_file}
-        Inputs: {self.inputs}
-        Machines: {self.machines}
-        MultiCycle: {self.multi_cycle}
+        type: {self.output_type}
+        impl: {self.impl_file}
+        inputs: {self.inputs}
+        networks: {self.networks}
+        multiCycle: {self.multi_cycle}
+        visibility: {self.visibility}
         """
 
 
-class Machine(OrcaComponent):
+class Network(Node):
+    """
+    A Network is a type that may have many inputs and many outputs.
+    It consists of collections of neuorons and other networks.
+
+    Args:
+        Node (_type_): _description_
+    """
     def __init__(
         self,
-        name,
-        *neurons,
-        description="",
-        dispatch="follow_inputs",
-        multi_cycle=False,
+        *args,
+        neurons: list[Neuron],
+        # https://peps.python.org/pep-0484/#forward-references
+        networks: list['Network'] = [],
+        multi_cycle: bool =False,
+        **kwargs,
     ):
-        OrcaComponent.__init__(self, name, description)
+        """_summary_
+
+        Args:
+            neurons (list[Neuron]): _description_
+            networks (list[Network], optional): _description_. Defaults to [].
+            multi_cycle (bool, optional): _description_. Defaults to False.
+        """
+        Node.__init__(self, *args, **kwargs)
 
         self.neurons = {neuron.name: neuron for neuron in neurons}
-        self.dispatch = dispatch
-        self.multi_cycle = multi_cycle
 
+        self.multi_cycle = multi_cycle
+        self.networks = networks
+
+    def validate(self):
         self.resolve_all_neurons()
 
     # TODO see about moving this to lower level components. Resolve
