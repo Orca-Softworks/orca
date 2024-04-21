@@ -22,7 +22,8 @@ def delay_bank(name, outputs, delay):
             f"{output.name}_delayed",
             "bool",
             "delay_bank.rs/delayed",
-            Input("valve_input", "bool", query=f"{output.name}"),
+            # you are allowed to use a neuron directly for a query
+            Input("valve_input", "bool", query=output),
             Input("bank_allow", output_states, query=f"{name}_bank_controller"),
             multi_cycle=True,
         )

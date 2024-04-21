@@ -1,4 +1,4 @@
-from base.neuron import Neuron
+from neuron.base.neuron.neuron import Neuron
 
 class SecondNanosecondNeuron(Neuron):
     def __init__(self, *args, **kwargs):
