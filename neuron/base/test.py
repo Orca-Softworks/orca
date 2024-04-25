@@ -1,4 +1,4 @@
-from neuron import *
+from . import *
 
 if __name__ == "__main__":
-    print("ran test for neuron")
+    neuron = Neuron("neuron", "u32", implementation="some_impl_file.rs")

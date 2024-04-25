@@ -1,3 +1,5 @@
+from ..common import RESERVED_WORDS
+
 
 class Node:
     def __init__(
@@ -16,14 +18,21 @@ class Node:
         # allows us to limit those that can see this part of the network.
         self.visibility = visibility
 
+        self._resolved = True
+
+        # Lets validate here. This will only do the validation for this
+        # class level. TODO: double check this.
+        Node.validate(self)
+
+    def get_resolved(self):
+        return self._resolved
+
+    def validate(self):
         if self.name in RESERVED_WORDS:
             self.error(
                 f"""Cannot use '{self.name}' as your component name.
                 See the list of reserved Orca words: {RESERVED_WORDS}"""
             )
-
-    def validate(self):
-        return
 
     def overview(self):
         return f"""

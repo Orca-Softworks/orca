@@ -1,3 +1,7 @@
+from ..node import Node
+from ..neuron import Neuron
+import time
+
 
 class Network(Node):
     """
@@ -7,13 +11,14 @@ class Network(Node):
     Args:
         Node (_type_): _description_
     """
+
     def __init__(
         self,
-        *args,
-        neurons: list[Neuron],
+        name,
         # https://peps.python.org/pep-0484/#forward-references
-        networks: list['Network'] = [],
-        multi_cycle: bool =False,
+        parts: list["Neuron|Network"],
+        multi_cycle: bool = False,
+        dispatch_rate = None,
         **kwargs,
     ):
         """_summary_
@@ -23,24 +28,26 @@ class Network(Node):
             networks (list[Network], optional): _description_. Defaults to [].
             multi_cycle (bool, optional): _description_. Defaults to False.
         """
-        Node.__init__(self, *args, **kwargs)
+        Node.__init__(self, name, **kwargs)
 
-        self.neurons = {neuron.name: neuron for neuron in neurons}
-
+        self.parts = parts
         self.multi_cycle = multi_cycle
-        self.networks = networks
+        self.dispatch_rate = dispatch_rate
 
-    def validate(self):
-        self.resolve_all_neurons()
+        self._unresolved_inputs = []
+        self._registry = {}
+        self._execution = []
 
-    # TODO see about moving this to lower level components. Resolve
-    def resolve_all_neurons(self):
-        for neuron in self.neurons.values():
-            self.resolve_single_neuron(neuron)
+        # need to collect inputs from all neurons that are not resolved.
+        for part in self.parts:
+            self._unresolved_inputs.extend(part._unresolved_inputs)
 
-    def resolve_single_neuron(self, neuron_to_resolve):
-        for input in neuron_to_resolve.inputs:
-            self.resolve_single_input(input)
+        # register all unresolved inputs with the network
+        # attempt to resolve each neuron against the registry
+        # iterate over each neuron that is not already resolved,
+
+    def attempt_to_resolve_query(self, query):
+        pass
 
     def resolve_single_input(self, input_to_resolve):
         resolved_input_neurons = []
@@ -90,3 +97,8 @@ class Network(Node):
         Dispatch: {self.dispatch}
         Multi-Cycle: {self.multi_cycle}
         """
+
+    def compute(self):
+        time.sleep(self.dispatch_rate)
+        for part in self._execution:
+            part.compute()

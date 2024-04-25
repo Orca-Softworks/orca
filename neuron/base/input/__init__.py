@@ -1,3 +1,4 @@
+from ..node import Node
 
 class Input(Node):
     """_summary_
@@ -8,12 +9,12 @@ class Input(Node):
 
     def __init__(
         self,
-        *args,
+        name,
         # The type of the input. Can translate (sometimes) one type to
         # another.
         input_type,
         # The output we should listen to somewhere else in the graph.
-        query=None,
+        resolve_to,
         # If this input comes from an output somewhere later in the network.
         feedback=False,
         # If this input should resolve to multiple neurons.
@@ -37,12 +38,12 @@ class Input(Node):
         big=False,
         **kwargs,
     ):
-        Node.__init__(self, *args, **kwargs)
+        Node.__init__(self, name, **kwargs)
 
         # should be possible to come up with different translations schemes.
         self.input_type = input_type
         # If we should listen to some output.
-        self.query = query
+        self.resolve_to = resolve_to
         # If this channel is fed back from a downstream calculation
         # into this one.
         self.feedback = feedback
@@ -58,22 +59,25 @@ class Input(Node):
         self.report_disconnect = report_disconnect
         self.big = big
 
-    def validate(self):
-        super().validate()
+        # we are only resolved on init if we are local.
+        self._resolved = self.resolve_to == "local"
 
-        if self.query == None and self.initial_value == None:
+        Input.validate(self)
+
+    def get_resolved(self):
+        return self._resolved
+
+    def validate(self):
+        if self.resolve_to == None and self.initial_value == None:
             self.error("Cannot set query and initial value together.")
 
-        if self.query != None and self.initial_value != None:
+        if self.resolve_to == None and self.initial_value != None:
             self.error("Must set an initial value if there is not query.")
-
-        # This input is going to have some set of resolved neurons based on its query.
-        self._resolved_neurons = []
 
     def overview(self):
         return f"""
         {super().overview()}
         input_type: {self.input_type}
-        query: {self.query}
+        connect_to: {self.connect_to}
         initial_value: {self.initial_value}
         """

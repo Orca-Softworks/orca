@@ -14,7 +14,7 @@
     for valve in valves.iter() {
         // TODO: make sleep a network of its own, and only impl wait_until
         // which only accepts a true or false.
-        sleep!(delay);
+        deactivate!(delay);
 
         out.set(valve.name);
     }
@@ -24,7 +24,8 @@
     // so what does this do? if we see the input boolean signal
     // fire, we then wait for the bank to allow us to output.
     if valve_input {
-        wait_until!(bank_allow);
+        // the first
+        wait_until!(bank_allow, "1s");
         out.set(valve_input);
     }
 }
