@@ -1,4 +1,5 @@
 from neuron.core import *
+from neuron.delayed_output import delayed_output_neuron
 
 
 def delay_bank(name, outputs, delay):
@@ -20,19 +21,10 @@ def delay_bank(name, outputs, delay):
         multi_cycle=True,
     )
 
-    delayed_outputs = [
-        Neuron(
-            f"{output.name}_delayed",
-            "bool",
-            "delay_bank.rs/delayed",
-            # you are allowed to use a neuron directly for a query
-            Input("valve_input", "bool", output),
-            Input("bank_allow", output_states, f"{name}_bank_controller"),
-            multi_cycle=True,
-        )
-        for output in outputs
-    ]
+    delayed_outputs = [delayed_output_neuron(output) for output in outputs]
 
     return Network(
-        f"{name}_delay_bank", [*delayed_outputs, bank_controller, *outputs], multi_cycle=True
+        f"{name}_delay_bank",
+        [*outputs, bank_controller, *delayed_outputs],
+        multi_cycle=True,
     )
